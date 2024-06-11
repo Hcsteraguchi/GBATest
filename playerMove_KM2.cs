@@ -73,7 +73,8 @@ public class PlayerMove_KM2 : MonoBehaviour
     {
         GROUND = 1,
         UP = 2,
-        DOWN = 3
+        DOWN = 3,
+        HIT = 4
     }
     //移動スピードと点滅の間隔
     [SerializeField] float speed, flashInterval;
@@ -92,9 +93,12 @@ public class PlayerMove_KM2 : MonoBehaviour
         MUTEKI
     }
     //STATE型の変数
-    STATE state;
+    STATE state = STATE.NOMAL;
+
     [SerializeField] private LayerMask GroundLayer;
     public float knockBackPower;   // ノックバックさせる力
+    private Damage PL;
+    float puramai;
     void Start()
     {
         //Rigidbody2Dを取得
@@ -106,6 +110,8 @@ public class PlayerMove_KM2 : MonoBehaviour
 
         //SpriteRenderer格納
         sp = GetComponent<SpriteRenderer>();
+
+        PL = GameObject.Find("PlayerBody").GetComponent<Damage>();
     }
 
     void Update()
@@ -138,12 +144,12 @@ public class PlayerMove_KM2 : MonoBehaviour
         {
             isGround = false;
         }
-        //if (state != STATE.DAMAGED)
-        //{
-        //    return;
-        //}
+        if (state == STATE.DAMAGED)
+        {
+            return;
+        }
         // ジャンプキー入力取得
-        if (Input.GetButton("Jump") && playerMove && state != STATE.DAMAGED)
+        if (Input.GetButton("Jump") && playerMove /*&& state != STATE.DAMAGED*/)
         {
             jumpKey = !keyLook;
         }
@@ -169,10 +175,7 @@ public class PlayerMove_KM2 : MonoBehaviour
 
 
 
-        if(state == STATE.DAMAGED)
-        {
-            return;
-        }
+
 
 
         //連続攻撃の連打判定用
@@ -310,6 +313,9 @@ public class PlayerMove_KM2 : MonoBehaviour
                 newvec.y -= (gravity * jumpTimer);//調整必要　下候補
                 //newvec.y -= (gravity * Mathf.Pow(jumpTimer, 2));
                 break;
+            case Status.HIT://?
+                Invoke("HITINV", 0.1f);
+                break;
 
             default:
                 break;
@@ -434,6 +440,32 @@ public class PlayerMove_KM2 : MonoBehaviour
     {
         dAttackNow = false;
     }
+    void HITINV()
+    {
+        playerStatus = Status.DOWN;
+    }
+    //void OnCollisionEnter2D(Collision2D col)
+    //{
+    //    if (col.gameObject.tag == "Enemy")
+    //    {
+    //        //変更 ノーマルじゃない（ダメージ中、無敵中）ときはリターン
+    //        if (state != STATE.NOMAL)
+    //        {
+    //            return;
+    //        }
+    //        playerMove = false;
+    //        Invoke("AGM", attackDelay);
+    //        //playerStatus = Status.HIT;//?
+    //        rb.velocity = Vector2.zero;
+
+    //        // 自分の位置と接触してきたオブジェクトの位置とを計算して、距離と方向を出して正規化(速度ベクトルを算出)
+    //        Vector2 distination = (transform.position - col.transform.position).normalized;
+
+    //        rb.AddForce(distination * knockBackPower);
+    //        state = STATE.DAMAGED;
+    //        StartCoroutine(_hit());
+    //    }
+    //}
 
 
     void OnCollisionStay2D(Collision2D collision)
@@ -454,26 +486,38 @@ public class PlayerMove_KM2 : MonoBehaviour
             airAttackCount = true;
         }
     }
-    private void OnTriggerEnter2D(Collider2D col)
+    public void ShowLog()
     {
-        if (col.gameObject.tag == "EnemyAttack")
+        // ログを表示します。
+        playerStatus = Status.DOWN;
+
+        //変更 ノーマルじゃない（ダメージ中、無敵中）ときはリターン
+        if (state != STATE.NOMAL)
         {
-            //変更 ノーマルじゃない（ダメージ中、無敵中）ときはリターン
-            if (state != STATE.NOMAL)
-            {
-                return;
-            }
-            playerMove = false;
-            Invoke("AGM", attackDelay);
-            rb.velocity = Vector2.zero;
-
-            // 自分の位置と接触してきたオブジェクトの位置とを計算して、距離と方向を出して正規化(速度ベクトルを算出)
-            Vector2 distination = (transform.position - col.transform.position).normalized;
-
-            rb.AddForce(distination * knockBackPower);
-            state = STATE.DAMAGED;
-            StartCoroutine(_hit());
+            return;
         }
+        playerMove = false;
+        Invoke("AGM", attackDelay);
+        //playerStatus = Status.HIT;//?
+        rb.velocity = Vector2.zero;
+
+        // 自分の位置と接触してきたオブジェクトの位置とを計算して、距離と方向を出して正規化(速度ベクトルを算出)
+        //Vector2 distination = (transform.position - PL.Enemy.transform.position).normalized;
+        //rb.AddForce(distination * knockBackPower);
+        float dist = transform.position.x - PL.Enemy.transform.position.x;
+        if(dist >= 0)
+        {
+             puramai = 1;
+        }
+        else
+        {
+            puramai = -1;
+        }
+        //rb.AddForce(Vector2.right * puramai * knockBackPower,0);
+        rb.AddForce((new Vector2 (1* puramai,5))  * knockBackPower, 0);
+
+        state = STATE.DAMAGED;
+        StartCoroutine(_hit());
 
     }
 
@@ -488,7 +532,7 @@ public class PlayerMove_KM2 : MonoBehaviour
             sp.enabled = false;
             yield return new WaitForSeconds(flashInterval);
             sp.enabled = true;
-            if (i > 20)
+            if (i > 10)//？？？
             {
                 state = STATE.MUTEKI;
                 sp.color = Color.green;
@@ -497,4 +541,6 @@ public class PlayerMove_KM2 : MonoBehaviour
         state = STATE.NOMAL;
         sp.color = Color.white;
     }
+
+
 }
