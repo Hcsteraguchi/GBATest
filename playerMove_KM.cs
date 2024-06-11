@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class PlayerMove_KM2 : MonoBehaviour
+public class PlayerMove_KM : MonoBehaviour
 {
     //ctrl+Fで検索
 
@@ -54,8 +54,8 @@ public class PlayerMove_KM2 : MonoBehaviour
     private float timer4 = 0.0f;//攻撃　連続　　再使用時間用　調整中
 
     //攻撃判定
-    [Header("通常攻撃判定")] [SerializeField] GameObject originObject;
-    [Header("空中攻撃判定")] [SerializeField] GameObject airAttackObject;
+    [Header("通常攻撃判定")] [SerializeField] GameObject normalObject;
+    [Header("空中攻撃判定")] [SerializeField] GameObject airObject;
     [Header("ダッシュ攻撃判定")] [SerializeField] GameObject dashObject;
     [Header("連続攻撃判定判定")] [SerializeField] GameObject mashObject;
     [Header("最終連続攻撃判定")] [SerializeField] GameObject lastObject;
@@ -69,12 +69,11 @@ public class PlayerMove_KM2 : MonoBehaviour
     private bool jumpKey = false; // ジャンプキー
     private bool keyLook = false; // ジャンプキー入力不能
 
-    enum Status//プレイヤー状態
+    enum Status//プレイヤー状態 上下
     {
         GROUND = 1,
         UP = 2,
-        DOWN = 3,
-        HIT = 4
+        DOWN = 3,      
     }
     //移動スピードと点滅の間隔
     [SerializeField] float speed, flashInterval;
@@ -242,7 +241,7 @@ public class PlayerMove_KM2 : MonoBehaviour
             nAttackNow = true;
             Invoke("AGSS", attackTime1);
 
-            GameObject childObject = Instantiate(originObject, transform);
+            GameObject childObject = Instantiate(normalObject, transform);
 
             Debug.Log("通常");
             timer1 = interval1;
@@ -254,7 +253,7 @@ public class PlayerMove_KM2 : MonoBehaviour
         else if (Input.GetButtonDown("Attack") && timer3 <= 0.0f && (playerStatus == Status.UP || playerStatus == Status.DOWN) && airAttackCount == true)//空中攻撃左
         {
             airAttackCount = false;
-            GameObject childObject = Instantiate(airAttackObject, transform);
+            GameObject childObject = Instantiate(airObject, transform);
             Debug.Log("空");
             timer1 = interval1;//?いるか、空中→通常の間
             timer3 = interval3;
@@ -312,10 +311,7 @@ public class PlayerMove_KM2 : MonoBehaviour
                 newvec.y = 0f;
                 newvec.y -= (gravity * jumpTimer);//調整必要　下候補
                 //newvec.y -= (gravity * Mathf.Pow(jumpTimer, 2));
-                break;
-            case Status.HIT://?
-                Invoke("HITINV", 0.1f);
-                break;
+                break;            
 
             default:
                 break;
@@ -440,32 +436,7 @@ public class PlayerMove_KM2 : MonoBehaviour
     {
         dAttackNow = false;
     }
-    void HITINV()
-    {
-        playerStatus = Status.DOWN;
-    }
-    //void OnCollisionEnter2D(Collision2D col)
-    //{
-    //    if (col.gameObject.tag == "Enemy")
-    //    {
-    //        //変更 ノーマルじゃない（ダメージ中、無敵中）ときはリターン
-    //        if (state != STATE.NOMAL)
-    //        {
-    //            return;
-    //        }
-    //        playerMove = false;
-    //        Invoke("AGM", attackDelay);
-    //        //playerStatus = Status.HIT;//?
-    //        rb.velocity = Vector2.zero;
-
-    //        // 自分の位置と接触してきたオブジェクトの位置とを計算して、距離と方向を出して正規化(速度ベクトルを算出)
-    //        Vector2 distination = (transform.position - col.transform.position).normalized;
-
-    //        rb.AddForce(distination * knockBackPower);
-    //        state = STATE.DAMAGED;
-    //        StartCoroutine(_hit());
-    //    }
-    //}
+    
 
 
     void OnCollisionStay2D(Collision2D collision)
@@ -497,8 +468,7 @@ public class PlayerMove_KM2 : MonoBehaviour
             return;
         }
         playerMove = false;
-        Invoke("AGM", attackDelay);
-        //playerStatus = Status.HIT;//?
+        Invoke("AGM", attackDelay);       
         rb.velocity = Vector2.zero;
 
         // 自分の位置と接触してきたオブジェクトの位置とを計算して、距離と方向を出して正規化(速度ベクトルを算出)
