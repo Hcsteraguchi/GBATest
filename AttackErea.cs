@@ -10,22 +10,17 @@ public class AttackErea : MonoBehaviour
     {
         Invoke("BRK", attckEreaTime);
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
+    
     void BRK()
     {
         Destroy(gameObject);
     }
+
     private void OnTriggerEnter2D(Collider2D col)
     {
         if (col.gameObject.tag == "Enemy")
         {
             Destroy(col.gameObject);
         }
-
     }
 }
