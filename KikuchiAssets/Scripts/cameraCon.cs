@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class cameraCon : MonoBehaviour
 {
-    GameObject player;
+    GameObject _player;
    // player movecamera;
     // Start is called before the first frame update
     private void Start()
     {
-        this.player = GameObject.Find("player");
+        this._player = GameObject.Find("Player");//プレイヤーのオブジェクト名
       //  movecamera = player.GetComponent<playerMove_KM2>();
     }
 
@@ -33,7 +33,7 @@ public class cameraCon : MonoBehaviour
         //}
         //else
         //{
-            Vector3 playerPos = this.player.transform.position;
+            Vector3 playerPos = this._player.transform.position;
             transform.position = new Vector3(playerPos.x + 5, 0, -10);
         //}
     }
