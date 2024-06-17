@@ -10,13 +10,7 @@ public class SubWeapon : MonoBehaviour
     /// <summary>
     /// 武器ごとに振られた固有番号管理用のEnum
     /// </summary>
-    public enum WeaponSelect
-    {
-        Sword=0,
-        Kunai=1,
-        Boomerang=2,
-        kamaitachi=3,
-    }
+   
     //クナイ用
     //プレイヤー位置とクナイオブジェ
     [Header("プレイヤー入れてね")][SerializeField] GameObject player = null;
@@ -26,81 +20,79 @@ public class SubWeapon : MonoBehaviour
 
     //ブーメラン用
 
-    [SerializeField] GameObject boomerang = null;
-    [SerializeField] GameObject boomerangTraget = null;
-    private float boomerangSpeed = 15f;
-    private Vector3 _boomerangPos;
+    [SerializeField] GameObject _boomerang = null;
+    [SerializeField] GameObject __boomerangTraget = null;
+    private float _boomerangSpeed = 15f;
+    private Vector3 __boomerangPos;
 
 
     //既に投げた後かの判定・ブーメランが戻る位置についたかの判定
-    private  bool _existsBoomerang = default;
+    private  bool _exists_boomerang = default;
     private  bool _canReturn = default;
     //かまいたち用
 
     [SerializeField] GameObject kamaitachi = null;
+    private bool _iskamaitati = default;
 
     //共通
 
     private Vector2 _playerPos;
     PrayerC playerScript;
-    public int _damage=0;
-    public WeaponSelect _weaponSelect=0;
-  
+   [SerializeField] private int _indexCnt = 1;
+    public bool _isOpenBox = default;
+
+    //インベントリが入っているオブジェクトを格納
+    [SerializeField] Inventory _weaponInventory;
   
     void Start()
     {
-       
         _playerPos = player.transform.position;
-        kunai.transform.position = _playerPos;
+       // kunai.transform.position = _playerPos;
         playerScript = player.GetComponent<PrayerC>();
-        _weaponSelect = 0;
         /**プレイヤーの位置を格納
          * プレイヤー位置にクナイを格納
          * プレイヤーのスクリプトを格納
          * 現在武器の初期化
          **/
 
-        boomerang.SetActive(false);
-        kamaitachi.SetActive(false);    
+        _boomerang.SetActive(false);
+        kamaitachi.SetActive(false);
+       
     }
     void Update()
     {
+     
+        //以下テスト用
+    }
+    public void SubWeaponUpdate()
+    {
         //選択されている武器をアップデートに呼び出す
-      switch(_weaponSelect)
+        switch (_weaponInventory._inventory[_indexCnt])
         {
-            case WeaponSelect.Sword:
+            case Inventory.WeaponSelect.nasi:
+                print("test");
                 break;
-            case WeaponSelect.Kunai:
+            case Inventory.WeaponSelect.Kunai:
                 KunaiWeapon();
                 break;
-            case WeaponSelect.Boomerang:
-                BoomerangWeapon();
+            case Inventory.WeaponSelect._boomerang:
+                _boomerangWeapon();
                 break;
-            case WeaponSelect.kamaitachi:
+            case Inventory.WeaponSelect.kamaitachi:
                 KamaitachiWeapon();
                 break;
         }
-        //武器の切り替え
-        //テスト用の機能なのでインベントリ機能ができたら置き換わります
-        if (Input.GetKeyDown(KeyCode.R))
+        //もし宝箱開封中でなければ武器を切り替えれるようにする
+        if (!_isOpenBox)
         {
-            if ((int)_weaponSelect == 3)
-            {
-                print("押してるよ");
-                _weaponSelect = 0;
-            }
-            else
-            {
-                print((int)_weaponSelect);
-             _weaponSelect++ ;
-            }
+            NotOpenBox();
         }
+
         //ブーメランの移動処理スイッチ文に入れると多分ばぐります
-        if (_existsBoomerang)
+        if (_exists_boomerang)
         {
-            BoomerangOperation();
+            _boomerangOperation();
         }
-        //以下テスト用
     }
    
     IEnumerator WeaponCoroutine(float time,int switchCor)
@@ -112,10 +104,11 @@ public class SubWeapon : MonoBehaviour
                 kamaitachi.SetActive(true);
                 yield return new WaitForSeconds (2);
                 kamaitachi.SetActive (false);
+                _iskamaitati = false;
                 break;
             case 1:
                 print("戻り");
-                boomerangSpeed = boomerangSpeed + 5;
+                _boomerangSpeed = _boomerangSpeed + 5;
                 _canReturn = true;
                 break;
             default: 
@@ -129,43 +122,73 @@ public class SubWeapon : MonoBehaviour
                 //break;
         }
     }
+    private void NotOpenBox()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (_indexCnt == _weaponInventory._maxIndex)
+            {
+                _indexCnt = 0;
+                print("現在のインベントリ番号" + _indexCnt);
+            }
+            else
+            {
+                _indexCnt = _indexCnt + 1;
+                print("現在のインベントリ番号" + _indexCnt);
+            }
+        }
+        if(Input.GetKeyDown(KeyCode.L))
+        {
+            if (_indexCnt == 0)
+            {
+                _indexCnt = _weaponInventory._maxIndex;
+                print("現在のインベントリ番号" + _indexCnt);
+            }
+            else
+            {
+                _indexCnt = _indexCnt - 1;
+                print("現在のインベントリ番号" + _indexCnt);
+            }
+        }
+    }
     private void KamaitachiWeapon()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E)&&!_iskamaitati)
         {
-            //二秒後にスキル発動
+            _iskamaitati = true;
+            //二秒後にスキル発動      
             StartCoroutine(WeaponCoroutine(2, 0));
         }
     }
-    private void BoomerangWeapon()
+    private void _boomerangWeapon()
     {
-        if (Input.GetKeyDown(KeyCode.E) && !_existsBoomerang)
+        if (Input.GetKeyDown(KeyCode.E) && !_exists_boomerang)
         {
             //ブーメランの位置などをセットしてブーメランを投げる
             _playerPos = player.transform.position;
-            boomerang.SetActive(true);
-            boomerang.transform.position = _playerPos;
-            _boomerangPos = boomerangTraget.transform.position;
-            _existsBoomerang = true;
+            _boomerang.SetActive(true);
+            _boomerang.transform.position = _playerPos;
+            __boomerangPos = __boomerangTraget.transform.position;
+            _exists_boomerang = true;
             //1.2秒後にブーメランの移動向きを変更する
             StartCoroutine(WeaponCoroutine(1.2f, 1));
         }
        
     }
-    private void BoomerangOperation()
+    private void _boomerangOperation()
     {
         if (_canReturn)
         {
             //ブーメランの戻り軌道
-            _boomerangPos = player.transform.position;
-            boomerang.transform.position = Vector2.MoveTowards
-                (boomerang.transform.position, _boomerangPos, boomerangSpeed * Time.deltaTime);
+            __boomerangPos = player.transform.position;
+            _boomerang.transform.position = Vector2.MoveTowards
+                (_boomerang.transform.position, __boomerangPos, _boomerangSpeed * Time.deltaTime);
         }
         else
         {
             //ブーメラン一回目の軌道
-            boomerang.transform.position = Vector2.MoveTowards
-           (boomerang.transform.position, _boomerangPos, boomerangSpeed * Time.deltaTime);
+            _boomerang.transform.position = Vector2.MoveTowards
+           (_boomerang.transform.position, __boomerangPos, _boomerangSpeed * Time.deltaTime);
         }
 
     }
@@ -184,13 +207,16 @@ public class SubWeapon : MonoBehaviour
             //右に飛ばすelseは左
             if (playerScript.rightNow)
             {
+                newkunai.transform.Rotate(new Vector3(0, 0, -90));            
                 this.kunaiRd.AddForce(new Vector2(1500f, 0f));
+                Destroy(newkunai, time);
             }
             else
             {
+                newkunai.transform.Rotate(new Vector3(0, -180, -90));
                 this.kunaiRd.AddForce(new Vector2(-1500f, 0f));
+                Destroy(newkunai, time);
             }
-            Destroy(newkunai, time);
           
         }
        
@@ -198,16 +224,16 @@ public class SubWeapon : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         //プレイヤーにぶつかったオブジェクトがブーメランなら処理をする
-        if (collision.gameObject == boomerang)
+        if (collision.gameObject == _boomerang)
         {
             //既に戻り処理に突入しているのなら回収する
             if (_canReturn)
             {
                 print("消滅");
                 _canReturn = false;
-                _existsBoomerang = false;
-                boomerangSpeed = 15;
-                boomerang.SetActive(false);
+                _exists_boomerang = false;
+                _boomerangSpeed = 15;
+                _boomerang.SetActive(false);
             }
         }
     }
