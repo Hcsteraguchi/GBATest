@@ -7,23 +7,21 @@ using UnityEngine;
 public class SubWeapon : MonoBehaviour
 {
     //   if (Input.GetKeyDown(KeyCode.E))の条件をコントローラーのスキル発動キーに置き換えて！！！
-    /// <summary>
-    /// 武器ごとに振られた固有番号管理用のEnum
-    /// </summary>
+   
    
     //クナイ用
     //プレイヤー位置とクナイオブジェ
-    [Header("プレイヤー入れてね")][SerializeField] GameObject player = null;
-    [SerializeField] GameObject kunai = null;
+    [Header("プレイヤーを入れる")][SerializeField] GameObject _player = null;
+    [Header("クナイを入れる")][SerializeField] GameObject _kunai = null;
  
-    Rigidbody2D kunaiRd;
+    Rigidbody2D _kunaiRd;
 
     //ブーメラン用
 
-    [SerializeField] GameObject _boomerang = null;
-    [SerializeField] GameObject __boomerangTraget = null;
+    [Header("ブーメランを入れる")] [SerializeField] GameObject _boomerang = null;
+    [Header("ブーメランの到達地点を入れる")] [SerializeField] GameObject _boomerangTraget = null;
     private float _boomerangSpeed = 15f;
-    private Vector3 __boomerangPos;
+    private Vector3 _boomerangPos;
 
 
     //既に投げた後かの判定・ブーメランが戻る位置についたかの判定
@@ -31,53 +29,51 @@ public class SubWeapon : MonoBehaviour
     private  bool _canReturn = default;
     //かまいたち用
 
-    [SerializeField] GameObject kamaitachi = null;
+    [Header("かまいたちを入れる")] [SerializeField] GameObject _kamaitachi = null;
     private bool _iskamaitati = default;
 
     //共通
 
     private Vector2 _playerPos;
-    PrayerC playerScript;
-   [SerializeField] private int _indexCnt = 1;
+    PrayerC _playerScript;
+    [Header("現在のサブ武器インベントリ番号")] [SerializeField] private int _indexCnt = 1;
     public bool _isOpenBox = default;
 
     //インベントリが入っているオブジェクトを格納
-    [SerializeField] Inventory _weaponInventory;
+    [Header("インベントリスクリプトが入ったObjを入れる")] [SerializeField] Inventory _weaponInventory;
   
     void Start()
     {
-        _playerPos = player.transform.position;
-       // kunai.transform.position = _playerPos;
-        playerScript = player.GetComponent<PrayerC>();
+        _playerPos = _player.transform.position;
+        _playerScript = _player.GetComponent<PrayerC>();
         /**プレイヤーの位置を格納
          * プレイヤー位置にクナイを格納
          * プレイヤーのスクリプトを格納
          * 現在武器の初期化
          **/
 
+        //ブーメランとかまいたちを非表示にする
         _boomerang.SetActive(false);
-        kamaitachi.SetActive(false);
+        _kamaitachi.SetActive(false);
        
-    }
-    void Update()
-    {
-     
-        //以下テスト用
     }
     public void SubWeaponUpdate()
     {
         //選択されている武器をアップデートに呼び出す
         switch (_weaponInventory._inventory[_indexCnt])
         {
+            //空っぽの時
             case Inventory.WeaponSelect.nasi:
-                print("test");
                 break;
+            //クナイの時
             case Inventory.WeaponSelect.Kunai:
                 KunaiWeapon();
                 break;
+            //ブーメランの時
             case Inventory.WeaponSelect._boomerang:
                 _boomerangWeapon();
                 break;
+            //かまいたちの時
             case Inventory.WeaponSelect.kamaitachi:
                 KamaitachiWeapon();
                 break;
@@ -101,16 +97,17 @@ public class SubWeapon : MonoBehaviour
         switch(switchCor)  
         {
             case 0:
-                kamaitachi.SetActive(true);
+                _kamaitachi.SetActive(true);
                 yield return new WaitForSeconds (2);
-                kamaitachi.SetActive (false);
+                _kamaitachi.SetActive (false);
                 _iskamaitati = false;
                 break;
+            //かまいたちを表示させてさらに指定秒後に終了する
             case 1:
-                print("戻り");
                 _boomerangSpeed = _boomerangSpeed + 5;
                 _canReturn = true;
                 break;
+            //ブーメランが返ってくるときブーメラン速度を上げる
             default: 
                 break;
        
@@ -124,6 +121,10 @@ public class SubWeapon : MonoBehaviour
     }
     private void NotOpenBox()
     {
+        /*RとLでインベントリを右左に選択する
+         * もし現在選択しているインベントリ番号が最後尾あるいは先頭の時
+         * 値をリセットする
+         */
         if (Input.GetKeyDown(KeyCode.R))
         {
             if (_indexCnt == _weaponInventory._maxIndex)
@@ -165,10 +166,10 @@ public class SubWeapon : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E) && !_exists_boomerang)
         {
             //ブーメランの位置などをセットしてブーメランを投げる
-            _playerPos = player.transform.position;
+            _playerPos = _player.transform.position;
             _boomerang.SetActive(true);
             _boomerang.transform.position = _playerPos;
-            __boomerangPos = __boomerangTraget.transform.position;
+            _boomerangPos = _boomerangTraget.transform.position;
             _exists_boomerang = true;
             //1.2秒後にブーメランの移動向きを変更する
             StartCoroutine(WeaponCoroutine(1.2f, 1));
@@ -180,15 +181,15 @@ public class SubWeapon : MonoBehaviour
         if (_canReturn)
         {
             //ブーメランの戻り軌道
-            __boomerangPos = player.transform.position;
+            _boomerangPos = _player.transform.position;
             _boomerang.transform.position = Vector2.MoveTowards
-                (_boomerang.transform.position, __boomerangPos, _boomerangSpeed * Time.deltaTime);
+                (_boomerang.transform.position, _boomerangPos, _boomerangSpeed * Time.deltaTime);
         }
         else
         {
             //ブーメラン一回目の軌道
             _boomerang.transform.position = Vector2.MoveTowards
-           (_boomerang.transform.position, __boomerangPos, _boomerangSpeed * Time.deltaTime);
+           (_boomerang.transform.position, _boomerangPos, _boomerangSpeed * Time.deltaTime);
         }
 
     }
@@ -198,23 +199,23 @@ public class SubWeapon : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E))
         {
             //現在地にクナイを生成して指定時間後に消去する
-            _playerPos = player.transform.position;
+            _playerPos = _player.transform.position;
             float time = 1f;
-            GameObject newkunai = Instantiate(kunai);
-            kunaiRd = newkunai.GetComponent<Rigidbody2D>();
+            GameObject newkunai = Instantiate(_kunai);
+            _kunaiRd = newkunai.GetComponent<Rigidbody2D>();
             newkunai.transform.position = _playerPos;
             //プレイヤーの向きによって射出方向を決定
             //右に飛ばすelseは左
-            if (playerScript.rightNow)
+            if (_playerScript.rightNow)
             {
                 newkunai.transform.Rotate(new Vector3(0, 0, -90));            
-                this.kunaiRd.AddForce(new Vector2(1500f, 0f));
+                this._kunaiRd.AddForce(new Vector2(1500f, 0f));
                 Destroy(newkunai, time);
             }
             else
             {
                 newkunai.transform.Rotate(new Vector3(0, -180, -90));
-                this.kunaiRd.AddForce(new Vector2(-1500f, 0f));
+                this._kunaiRd.AddForce(new Vector2(-1500f, 0f));
                 Destroy(newkunai, time);
             }
           

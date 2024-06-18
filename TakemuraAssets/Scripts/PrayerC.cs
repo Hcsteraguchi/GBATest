@@ -31,7 +31,6 @@ public class PrayerC : MonoBehaviour
 
 
     //ここから追加！！！！！！
-    [SerializeField] private GameObject _player;
     private SubWeapon _subWeapon;
 
 
@@ -41,7 +40,7 @@ public class PrayerC : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
 
         // ここから追加！！！！！！！！！
-        _subWeapon = _player.GetComponent<SubWeapon>();
+        _subWeapon = gameObject.GetComponent<SubWeapon>();
     }
     private void Update()
     {
