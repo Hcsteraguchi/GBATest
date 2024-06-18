@@ -4,5 +4,6 @@ using UnityEngine;
 
 public class Damage : MonoBehaviour
 {
-    [SerializeField]public int _Damage;
+    //•Ší‚É‚Â‚¯‚é
+    [Header("‚±‚Ì•Ší‚ÌUŒ‚—Í")] [SerializeField]public int _Damage;
 }
