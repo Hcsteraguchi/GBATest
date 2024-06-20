@@ -12,7 +12,6 @@ public class TreasureBox : MonoBehaviour
 
     //宝箱開封中かどうかの判定
     public bool _isopenBox = default;
-    //宝箱が速攻閉じないようにしてるテスト判定
 
     //必要な他クラス
     Inventory _inventorycs;
@@ -21,13 +20,12 @@ public class TreasureBox : MonoBehaviour
     {
       //  _subWeapon = _player.GetComponent<SubWeapon>();
         _inventorycs = _player.GetComponent<Inventory>();
-        _playerMove = _player.GetComponent<PlayerMove_KM>();
-
-       
+        _playerMove = _player.GetComponent<PlayerMove_KM>();     
     }
 
     void Update()
     {
+        //宝箱が開封されたら起動する
         if(_isopenBox)
         {
             WeaponGet();
@@ -50,6 +48,11 @@ public class TreasureBox : MonoBehaviour
                 }
             }
         }
+        /*宝箱内のアイテムとインベントリ内のアイテムを比較して
+         * 重複するものがあったら宝箱からそのアイテムを除外する
+         * （未）削除された分別のアイテムを宝箱内に補充する
+         * 
+         */
         print("成功");
 
        
@@ -65,7 +68,7 @@ public class TreasureBox : MonoBehaviour
         //        _playerMove._isPlayeropenBox = false;
         //}
         //選ぶオブジェクトを右に
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetButtonDown("RightChange"))
         {
             if (_item == _itemBoxList.Count-1)
             {
@@ -77,7 +80,7 @@ public class TreasureBox : MonoBehaviour
             }
         }
         //選ぶオブジェクトを左に
-        if (Input.GetKeyDown(KeyCode.L))
+        if (Input.GetButtonDown("LeftChange"))
         {
             if (_item == 0)
             {

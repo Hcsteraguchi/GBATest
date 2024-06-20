@@ -36,7 +36,7 @@ public class Inventory : MonoBehaviour
     }
     public void InventBox(WeaponSelect select)
     {
-        //枠があるかの確認変数（α版は必要なし）
+
         //int itemCnt = 0;
         //今回選ばれた武器
 
