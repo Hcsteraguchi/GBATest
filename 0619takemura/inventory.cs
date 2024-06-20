@@ -16,17 +16,11 @@ public class Inventory : MonoBehaviour
         Kunai = 1,
         Boomerang = 2,
         Kamaitachi = 3,
-        //以下テスト用削除可能
-        test1=4,
-        test2=5,
-        test3=6,
-        test4=7,
     }
-    [Header("現在持っている武器")]
     [SerializeField]
-    public List<WeaponSelect> _inventoryList =
-        new List<WeaponSelect>();
-    [Header("まだ入手していない武器")] public List<WeaponSelect> _notHaveWeapon;
+    public List<Inventory.WeaponSelect> _inventoryList =
+        new List<Inventory.WeaponSelect>();
+    //[Header("現在のインベントリ情報")]public WeaponSelect[]_inventory = { 0,0,0 };
     [Header("インベントリリストの最大")] private const int _maxIndex = 10;
     public int _maxIndexCnt = -1;
     public int _indexCnt = default;
@@ -49,7 +43,35 @@ public class Inventory : MonoBehaviour
         print(select);
         _maxIndexCnt++;
         _inventoryList.Add(select);
-        _notHaveWeapon.Remove(select);
+     
+        //for (int i = 0; i <= _maxIndex; i++)
+        //{
+        //    if (_inventoryList[i] == select)
+        //    {
+        //        _inventoryList[i] = select;
+        //        _maxIndexCnt++;
+        //       // break;
+        //    }
+        //}
+
+
+        ////配列の一番最後まで比較を繰り返す
+        //for (int i = 0; i<=_maxIndex; i++)
+        //{
+        //    itemCnt++;
+        //    //インベントリが空もしくは既に武器を所持していたらそこに武器を格納
+        //    if (_inventory[i]==0||_inventory[i]==select)
+        //    {
+        //        _inventory[i] = select;
+        //        break;
+        //    }
+        //}
+        ////インベントリに空きがなかった場合交換処理を呼び出す
+        ////まだ未完成＆α版に影響なし
+        //if(itemCnt<=_maxIndex)
+        //{
+        //    print("交換しなさい");
+        //}
 
     }
     public void ChangeWeapon()

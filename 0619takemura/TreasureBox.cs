@@ -36,50 +36,37 @@ public class TreasureBox : MonoBehaviour
     {
         int listCnt = _itemBoxList.Count;
         listCnt = listCnt - 1;
-        int startListCnt = listCnt;
-        List<Inventory.WeaponSelect> copyList =
-            new List<Inventory.WeaponSelect>(_inventorycs._notHaveWeapon);
-        for (int i = 0; i <= _inventorycs._maxIndexCnt; i++)
+        for (int j = 0; j <= _inventorycs._maxIndexCnt; j++)
         {
-            for (int j = 0; j <= listCnt; j++)
+            for (int i = 0; i <= listCnt; i++)
             {
-                if (_itemBoxList[j] == _inventorycs._inventoryList[i])
+                if (_itemBoxList[i] == _inventorycs._inventoryList[j])
                 {
-                    _itemBoxList.Remove(_itemBoxList[j]);
-                   
-                    j = j - 1;
+                    _itemBoxList.Remove(_itemBoxList[i]);
+                    i = i - 1;
                     listCnt = listCnt - 1;
                 }
             }
         }
         /*宝箱内のアイテムとインベントリ内のアイテムを比較して
-       * 重複するものがあったら宝箱からそのアイテムを除外する
-       */
-        if (listCnt<startListCnt)
-        {
-            //宝箱に入ってるアイテムを除外する
-            for (int i = 0; i < _itemBoxList.Count; i++)
-            {
-                for (int j = 0; j < copyList.Count; j++)
-                {
-                    if (_itemBoxList[i] == copyList[j])
-                    {
-                        copyList.Remove(copyList[j]);
-                    }
-                }
-            }
+         * 重複するものがあったら宝箱からそのアイテムを除外する
+         * （未）削除された分別のアイテムを宝箱内に補充する
+         * 
+         */
+        print("成功");
 
-            //足りない分を補充する
-            for (int i = listCnt; i < startListCnt; i++)
-            {
-                int rndWeapon = Random.Range(0, copyList.Count);
-                _itemBoxList.Add(copyList[rndWeapon]);
-                copyList.Remove(copyList[rndWeapon]);
-            }
-        }
+       
+
     }
     private void WeaponGet()
     {
+        //if (Input.GetButtonDown("Open"))
+        //{       
+        //        //二回目はここを通る
+        //        print("宝箱閉じる");
+        //        _isopenBox = false;
+        //        _playerMove._isPlayeropenBox = false;
+        //}
         //選ぶオブジェクトを右に
         if (Input.GetButtonDown("RightChange"))
         {
@@ -111,7 +98,6 @@ public class TreasureBox : MonoBehaviour
             _inventorycs.InventBox(_itemBoxList[_item]);
             _playerMove._isPlayeropenBox = false;
             _isopenBox = false;
-            this.gameObject.SetActive(false);
         }
 
     }
@@ -125,6 +111,7 @@ public class TreasureBox : MonoBehaviour
                     TreasureSet();
                     _isopenBox = true;
                     _playerMove._isPlayeropenBox = true;
+                 //   _subWeapon._isOpenBox = true;
                 }                   
         }
         /*宝箱のオブジェクトにプレイヤーが触れている間
