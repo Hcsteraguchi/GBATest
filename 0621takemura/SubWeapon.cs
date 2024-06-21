@@ -42,6 +42,12 @@ public class SubWeapon : MonoBehaviour
 
     Animator _animator;
 
+    //MP
+    public float MP = 100;
+    [SerializeField] private int _kunaiMP = 5;
+    [SerializeField] private int _booMP = 15;
+    [SerializeField] private int _kamaitachiMP = 70;
+
     void Start()
     {
         _playerPos = gameObject.transform.position;
@@ -78,10 +84,7 @@ public class SubWeapon : MonoBehaviour
             case Inventory.WeaponSelect.Kamaitachi:
                 KamaitachiWeapon();
                 break;
-        }
-        //もし宝箱開封中でなければ武器を切り替えれるようにする     
-            NotOpenBox();
-
+        } 
         //ブーメランの移動処理スイッチ文に入れると多分ばぐります
         if (_exists_boomerang)
         {
@@ -117,18 +120,11 @@ public class SubWeapon : MonoBehaviour
                 //break;
         }
     }
-    private void NotOpenBox()
-    {
-        /*RとLでインベントリを右左に選択する
-         * もし現在選択しているインベントリ番号が最後尾あるいは先頭の時
-         * 値をリセットする
-         */
-      
-    }
     private void KamaitachiWeapon()
     {
-        if (Input.GetButtonDown("SubAttack")/*Input.GetKeyDown(KeyCode.E)*/&& !_iskamaitati)
+        if (Input.GetButtonDown("SubAttack")&& !_iskamaitati && MP >= _kamaitachiMP)
         {
+            MP -= _kamaitachiMP;
             _animator.Play("playerThrow");
             _iskamaitati = true;
             //二秒後にスキル発動      
@@ -137,8 +133,9 @@ public class SubWeapon : MonoBehaviour
     }
     private void _boomerangWeapon()
     {
-        if (Input.GetButtonDown("SubAttack")/*Input.GetKeyDown(KeyCode.E)*/ && !_exists_boomerang)
+        if (Input.GetButtonDown("SubAttack") && !_exists_boomerang &&MP >= _booMP)
         {
+            MP -= _booMP;
             _animator.Play("playerThrow");
             //ブーメランの位置などをセットしてブーメランを投げる
             _playerPos = gameObject.transform.position;
@@ -171,8 +168,9 @@ public class SubWeapon : MonoBehaviour
      private void KunaiWeapon()
     {
         //クナイ生成
-        if (Input.GetButtonDown("SubAttack")/*Input.GetKeyDown(KeyCode.E)*/)
+        if (Input.GetButtonDown("SubAttack")&& MP >= _kunaiMP)
         {
+            MP -= _kunaiMP;
             _animator.Play("playerThrow");
             //現在地にクナイを生成して指定時間後に消去する
             _playerPos = gameObject.transform.position;
