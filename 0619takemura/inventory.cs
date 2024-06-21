@@ -29,7 +29,8 @@ public class Inventory : MonoBehaviour
     [Header("まだ入手していない武器")] public List<WeaponSelect> _notHaveWeapon;
     [Header("インベントリリストの最大")] private const int _maxIndex = 10;
     public int _maxIndexCnt = -1;
-    public int _indexCnt = default;
+    private bool _isNothing = default;
+    [SerializeField]public int _indexCnt = default;
 
     // インベントリ画像
     [Header("対応させる画像")] [SerializeField] private Image _nowInventory = default;
@@ -38,7 +39,8 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
-        _inventoryChange = _nowInventory.GetComponent<InventoryChange>();
+        //_inventoryChange = _nowInventory.GetComponent<InventoryChange>();
+        _inventoryList.Add(WeaponSelect.Nasi);
     }
     public void InventBox(WeaponSelect select)
     {
@@ -50,6 +52,11 @@ public class Inventory : MonoBehaviour
         _maxIndexCnt++;
         _inventoryList.Add(select);
         _notHaveWeapon.Remove(select);
+        if(!_isNothing)
+        {
+            _isNothing = true;
+            _inventoryList.Remove(WeaponSelect.Nasi);
+        }
 
     }
     public void ChangeWeapon()
@@ -63,14 +70,14 @@ public class Inventory : MonoBehaviour
             if (_indexCnt >= _maxIndexCnt)
             {
                 _indexCnt = 0;
-                _inventoryChange._inventoryNum = 0;//配列番号をずらして画像を変更させる
-                _inventoryChange.InventoryState();
+                //_inventoryChange._inventoryNum = 0;//配列番号をずらして画像を変更させる
+                //_inventoryChange.InventoryState();
                 print("現在のインベントリ番号" + _indexCnt);
             }
             else
             {
-                _inventoryChange._inventoryNum++; //配列番号をずらして画像を変更させる
-                _inventoryChange.InventoryState();
+                //_inventoryChange._inventoryNum++; //配列番号をずらして画像を変更させる
+                //_inventoryChange.InventoryState();
                 _indexCnt = _indexCnt + 1;
                 print("現在のインベントリ番号" + _indexCnt);
             }
@@ -79,15 +86,15 @@ public class Inventory : MonoBehaviour
         {
             if (_indexCnt <= 0)
             {
-                _inventoryChange._inventoryNum = _maxIndexCnt; //配列番号をずらして画像を変更させる
-                _inventoryChange.InventoryState();
+                //_inventoryChange._inventoryNum = _maxIndexCnt; //配列番号をずらして画像を変更させる
+                //_inventoryChange.InventoryState();
                 _indexCnt = _maxIndexCnt;
                 print("現在のインベントリ番号" + _indexCnt);
             }
             else
             {
-                _inventoryChange._inventoryNum--; //配列番号をずらして画像を変更させる
-                _inventoryChange.InventoryState();
+                //_inventoryChange._inventoryNum--; //配列番号をずらして画像を変更させる
+                //_inventoryChange.InventoryState();
                 _indexCnt = _indexCnt - 1;
                 print("現在のインベントリ番号" + _indexCnt);
             }
