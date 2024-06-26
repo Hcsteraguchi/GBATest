@@ -5,10 +5,14 @@ using UnityEngine;
 public class TreasureBox : MonoBehaviour
 {
     [Header("プレイヤーを入れる")] [SerializeField] private GameObject _player = default;
+    [Header("InventoryCanvasをアタッチ")] [SerializeField]
+    private GameObject _inventoryCanvas = default;
+    [Header("GameControllerをアタッチ")] [SerializeField]
+    private GameObject _gameController = default;
     [Header("この宝箱に入れるアイテムを格納するリスト")]
     [SerializeField] private List<Inventory.WeaponSelect> _itemBoxList =
         new List<Inventory.WeaponSelect>();
-    [Header("今選ばれているアイテム")] [SerializeField] private int _item = 0;
+    [Header("今選ばれているアイテム")] [SerializeField] public int _item = 0;
 
     //宝箱開封中かどうかの判定
     public bool _isopenBox = default;
@@ -16,11 +20,17 @@ public class TreasureBox : MonoBehaviour
     //必要な他クラス
     Inventory _inventorycs;
     PlayerMove_KM _playerMove;
+    [Header("InventoryUIをアタッチ")] [SerializeField]
+    private InventoryUI _inventoryUI = default;
+    [Header("SubweponUIをアタッチ")] [SerializeField]
+    private SubWeaponUI _subweponUI = default;
     private void Start()
     {
       //  _subWeapon = _player.GetComponent<SubWeapon>();
         _inventorycs = _player.GetComponent<Inventory>();
-        _playerMove = _player.GetComponent<PlayerMove_KM>();     
+        _playerMove = _player.GetComponent<PlayerMove_KM>();
+        _subweponUI = _gameController.GetComponent<SubWeaponUI>();
+        _inventoryUI = _inventoryCanvas.GetComponent<InventoryUI>();
     }
 
     void Update()
@@ -46,7 +56,6 @@ public class TreasureBox : MonoBehaviour
                 if (_itemBoxList[j] == _inventorycs._inventoryList[i])
                 {
                     _itemBoxList.Remove(_itemBoxList[j]);
-                   
                     j = j - 1;
                     listCnt = listCnt - 1;
                 }
@@ -86,10 +95,12 @@ public class TreasureBox : MonoBehaviour
             if (_item == _itemBoxList.Count-1)
             {
                 _item = 0;
+                _inventoryUI.InventoryNumber();
             }
             else
             {
                 _item = _item+1;
+                _inventoryUI.InventoryNumber();
             }
         }
         //選ぶオブジェクトを左に
@@ -98,17 +109,21 @@ public class TreasureBox : MonoBehaviour
             if (_item == 0)
             {
                 _item = _itemBoxList.Count-1;
+                _inventoryUI.InventoryNumber();
             }
             else
             {
                 _item = _item-1;
+                _inventoryUI.InventoryNumber();
             }
+            
         }
         //選択中の武器をインベントリに入れるように
         if (Input.GetButtonDown("Attack"))
         {
             _inventorycs = _player.GetComponent<Inventory>();
             _inventorycs.InventBox(_itemBoxList[_item]);
+            _inventoryUI.InventoryDecision();
             _playerMove._isPlayeropenBox = false;
             _isopenBox = false;
             this.gameObject.SetActive(false);
@@ -123,6 +138,7 @@ public class TreasureBox : MonoBehaviour
                 {
                     print("宝箱開封");
                     TreasureSet();
+                    _subweponUI.InventoryDisplay();
                     _isopenBox = true;
                     _playerMove._isPlayeropenBox = true;
                 }                   
